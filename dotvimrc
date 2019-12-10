@@ -1,0 +1,26 @@
+call plug#begin()
+Plug 'arcticicestudio/nord-vim'
+Plug 'powerline/powerline'
+call plug#end()
+
+
+syntax on
+filetype on
+filetype plugin on
+colorscheme nord
+
+set fileencoding=utf8
+set nocompatible
+set backspace=2
+set ai                      " autoindent
+set cin                     " c-indent
+set hlsearch                " highlight matches when search
+set et                      " expand tab
+set nu                      " line numbering
+set shiftwidth=4
+set softtabstop=4
+set mouse=a
+
+set rtp+=$HOME/.vim/plugged/powerline/powerline/bindings/vim
+set laststatus=2
+set t_Co=256

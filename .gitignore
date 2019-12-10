@@ -1,0 +1,9 @@
+dotvim/plugged
+
+dotconfig/autostart
+dotconfig/dconf
+dotconfig/yay
+dotconfig/gtk-3.0
+dotconfig/sinew.in
+
+dotvim/.*

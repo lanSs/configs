@@ -1,0 +1,14 @@
+[color]
+    diff = auto
+    branch = auto
+    status = auto
+
+[user]
+    name = Li Chen
+    email = mail@chen.li
+
+[core]
+    editor = vim
+
+[push]
+    default = simple
