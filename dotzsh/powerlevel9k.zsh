@@ -1,4 +1,8 @@
-source /usr/share/zsh-theme-powerlevel9k/powerlevel9k.zsh-theme
+if [[ "$OSTYPE" == "linux"* ]]; then
+    source /usr/share/zsh-theme-powerlevel9k/powerlevel9k.zsh-theme
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+    source /usr/local/opt/powerlevel9k/powerlevel9k.zsh-theme
+fi
 
 ZSH_THEME="powerlevel9k/powerlevel9k"
 POWERLEVEL9K_MODE="awesome-fontconfig"
