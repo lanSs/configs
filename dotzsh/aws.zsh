@@ -1,4 +1,5 @@
 export AWS_DEFAULT_PROFILE="hinge-dev"
+export AWS_PROFILE=$AWS_DEFAULT_PROFILE
 
 #  Usage: aws-instances [filter]
 aws-instances() {
@@ -38,7 +39,10 @@ aws-profile() {
     else
         if grep '\[' $HOME/.aws/credentials | tr -d '[]' | grep -q "^${1}$"; then 
             echo "Swithing to profile: $1"
+            # This is used by SDK
             export AWS_PROFILE=$1
+            # This is used by cli
+            export AWS_DEFAULT_PROFILE=$1
         else
             echo "Invalid AWS profile: $1"
         fi
