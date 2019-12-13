@@ -34,8 +34,20 @@ aws-connect() {
 
 # Usage: aws-profile [name]
 aws-profile() {
+    local yellow darkbg normal
+    yellow=$(tput setaf 3 || true)
+    darkbg=$(tput setab 0 || true)
+    normal=$(tput sgr0 || true)
+
     if [ $# -eq 0 ]; then
-        grep '\[' ~/.aws/credentials | tr -d '[]'
+
+        for p in $(grep '\[' ~/.aws/credentials | tr -d '[]' | sort -n); do
+            if [ "$AWS_DEFAULT_PROFILE" = "$p" ]; then
+                echo "${darkbg}${yellow}${p}${normal}"
+            else
+                echo $p
+            fi
+        done
     else
         if grep '\[' $HOME/.aws/credentials | tr -d '[]' | grep -q "^${1}$"; then 
             echo "Swithing to profile: $1"
