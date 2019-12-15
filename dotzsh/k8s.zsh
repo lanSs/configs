@@ -1,5 +1,5 @@
-export KUBECTL_CONTEXT="dev-eks-02"
-export KUBECTL_NAMESPACE="hinge-services"
+export KUBECTL_CONTEXT=""
+export KUBECTL_NAMESPACE="default"
 
 alias kc='kubectl --context="$KUBECTL_CONTEXT" --namespace="$KUBECTL_NAMESPACE"'
 
@@ -31,6 +31,12 @@ kc-ctx() {
             echo "Invalid context: $1"
         fi
     fi
+}
+
+kc-ctx-unset() {
+    export KUBECTL_CONTEXT=""
+    # in case the current-context is set externally
+    kubectl config unset current-context > /dev/null
 }
 
 # Usage: kc-ctx-renamce old new

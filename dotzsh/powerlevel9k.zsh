@@ -8,7 +8,11 @@ ZSH_THEME="powerlevel9k/powerlevel9k"
 POWERLEVEL9K_MODE="awesome-fontconfig"
 
 prompt_kc() {
-    echo -en "\u2388 $KUBECTL_CONTEXT/$KUBECTL_NAMESPACE"
+    if [ -z "$KUBECTL_CONTEXT" ]; then
+        echo -en "\u2388"
+    else
+        echo -en "\u2388 $KUBECTL_CONTEXT/$KUBECTL_NAMESPACE"
+    fi
 }
 
 POWERLEVEL9K_CUSTOM_KC="prompt_kc"
