@@ -1,3 +1,7 @@
+HISTFILE=$HOME/.zsh_history
+HISTSIZE=100000
+SAVEHIST=$HISTSIZE
+
 for file in $HOME/.zsh/*.zsh; do
     source $file
 done
