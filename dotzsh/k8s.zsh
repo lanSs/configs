@@ -44,7 +44,7 @@ kc-ctx-rename() {
     if [ $# -ne 2 ]; then
         echo "kc-ctx-rename old new"
     else
-        kubectx config rename-context "$1" "$2"
+        kubectl config rename-context "$1" "$2"
     fi
 }
 
