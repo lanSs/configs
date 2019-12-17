@@ -2,6 +2,7 @@ export KUBECTL_CONTEXT=""
 export KUBECTL_NAMESPACE="default"
 
 alias kc='kubectl --context="$KUBECTL_CONTEXT" --namespace="$KUBECTL_NAMESPACE"'
+alias helm='helm --kube-context $KUBECTL_CONTEXT'
 
 # unset
 kubectl config unset current-context > /dev/null
