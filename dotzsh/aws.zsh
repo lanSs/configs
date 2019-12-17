@@ -1,6 +1,15 @@
 export AWS_DEFAULT_PROFILE="hinge-dev"
 export AWS_PROFILE=$AWS_DEFAULT_PROFILE
 
+# keep varibles between session
+AWS_PROFILE_TMP="/tmp/aws_profile"
+
+if [ -f $AWS_PROFILE_TMP ]; then
+    VALUE=$(<$AWS_PROFILE_TMP)
+    export AWS_DEFAULT_PROFILE=$VALUE
+    export AWS_PROFILE=$VALUE
+fi
+
 #  Usage: aws-instances [filter]
 aws-instances() {
     if [ $# -eq 0 ]; then
@@ -55,6 +64,7 @@ aws-profile() {
             export AWS_PROFILE=$1
             # This is used by cli
             export AWS_DEFAULT_PROFILE=$1
+            echo -n $1 > $AWS_PROFILE_TMP
         else
             echo "Invalid AWS profile: $1"
         fi

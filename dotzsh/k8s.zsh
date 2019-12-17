@@ -6,6 +6,20 @@ alias kc='kubectl --context="$KUBECTL_CONTEXT" --namespace="$KUBECTL_NAMESPACE"'
 # unset
 kubectl config unset current-context > /dev/null
 
+# keep varibles between session
+KUBECTL_CONTEXT_TMP="/tmp/kubectl_context"
+KUBECTL_NAMESPACE_TMP="/tmp/kubectl_namespace"
+
+if [ -f $KUBECTL_CONTEXT_TMP ]; then
+    VALUE=$(<$KUBECTL_CONTEXT_TMP)
+    export KUBECTL_CONTEXT=$VALUE
+fi
+
+if [ -f $KUBECTL_NAMESPACE_TMP ]; then
+    VALUE=$(<$KUBECTL_NAMESPACE_TMP)
+    export KUBECTL_NAMESPACE=$VALUE
+fi
+
 # Usage: kc-ctx [context]
 kc-ctx() {
     local yellow=$(tput setaf 3 || true)
@@ -26,6 +40,7 @@ kc-ctx() {
     else
         if kubectl config get-contexts -o=name | grep -q "^${1}$"; then
             export KUBECTL_CONTEXT=$1
+            echo -n $1 > $KUBECTL_CONTEXT_TMP
             echo "Switched to context: $1"
         else
             echo "Invalid context: $1"
@@ -35,6 +50,8 @@ kc-ctx() {
 
 kc-ctx-unset() {
     export KUBECTL_CONTEXT=""
+    rm $KUBECTL_CONTEXT_TMP
+    rm $KUBECTL_NAMESPACE_TMP
     # in case the current-context is set externally
     kubectl config unset current-context > /dev/null
 }
@@ -65,6 +82,7 @@ kc-ns() {
     else
         if kubectl --context="$KUBECTL_CONTEXT" get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}' | grep -q "^${1}$"; then
             export KUBECTL_NAMESPACE=$1
+            echo -n $1 > $KUBECTL_NAMESPACE_TMP
             echo "Switched to namespace: $1"
         else
             echo "Invalid namespace: $1"
