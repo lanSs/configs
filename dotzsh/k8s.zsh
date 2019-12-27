@@ -1,25 +1,4 @@
-export KUBECTL_CONTEXT=""
-export KUBECTL_NAMESPACE="default"
-
-alias kc='kubectl --context="$KUBECTL_CONTEXT" --namespace="$KUBECTL_NAMESPACE"'
-alias helm='helm --kube-context $KUBECTL_CONTEXT'
-
-# unset
-kubectl config unset current-context > /dev/null
-
-# keep varibles between session
-KUBECTL_CONTEXT_TMP="/tmp/kubectl_context"
-KUBECTL_NAMESPACE_TMP="/tmp/kubectl_namespace"
-
-if [ -f $KUBECTL_CONTEXT_TMP ]; then
-    VALUE=$(<$KUBECTL_CONTEXT_TMP)
-    export KUBECTL_CONTEXT=$VALUE
-fi
-
-if [ -f $KUBECTL_NAMESPACE_TMP ]; then
-    VALUE=$(<$KUBECTL_NAMESPACE_TMP)
-    export KUBECTL_NAMESPACE=$VALUE
-fi
+alias kc='kubectl'
 
 # Usage: kc-ctx [context]
 kc-ctx() {
@@ -32,7 +11,7 @@ kc-ctx() {
         local ctx_list=$(kubectl config get-contexts -o=name | sort -n)
 
         for c in $ctx_list; do
-            if [ "$KUBECTL_CONTEXT" = "$c" ]; then
+            if [ "$current_ctx" = "$c" ]; then
                 echo "${darkbg}${yellow}${c}${normal}"
             else
                 echo $c
@@ -40,8 +19,7 @@ kc-ctx() {
         done
     else
         if kubectl config get-contexts -o=name | grep -q "^${1}$"; then
-            export KUBECTL_CONTEXT=$1
-            echo -n $1 > $KUBECTL_CONTEXT_TMP
+            kubectl config use-context $1 > /dev/null
             echo "Switched to context: $1"
         else
             echo "Invalid context: $1"
@@ -50,10 +28,6 @@ kc-ctx() {
 }
 
 kc-ctx-unset() {
-    export KUBECTL_CONTEXT=""
-    rm $KUBECTL_CONTEXT_TMP
-    rm $KUBECTL_NAMESPACE_TMP
-    # in case the current-context is set externally
     kubectl config unset current-context > /dev/null
 }
 
@@ -72,18 +46,20 @@ kc-ns() {
     local darkbg=$(tput setab 0 || true)
     local normal=$(tput sgr0 || true)
 
+    local current_ctx=$(kubectl config view -o=jsonpath='{.current-context}')
+    local current_ns=$(kubectl config view -o=jsonpath="{.contexts[?(@.name==\"${current_ctx}\")].context.namespace}")
+
     if [ $# -eq 0 ]; then
-        for n in $(kubectl --context="$KUBECTL_CONTEXT" get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'); do
-            if [ "$KUBECTL_NAMESPACE" = "$n" ]; then
+        for n in $(kubectl get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}'); do
+            if [ "$current_ns" = "$n" ]; then
                 echo "${darkbg}${yellow}${n}${normal}"
             else
                 echo $n
             fi
         done
     else
-        if kubectl --context="$KUBECTL_CONTEXT" get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}' | grep -q "^${1}$"; then
-            export KUBECTL_NAMESPACE=$1
-            echo -n $1 > $KUBECTL_NAMESPACE_TMP
+        if kubectl get namespaces -o=jsonpath='{range .items[*].metadata.name}{@}{"\n"}{end}' | grep -q "^${1}$"; then
+            kubectl config set-context $current_ctx --namespace $1 > /dev/null
             echo "Switched to namespace: $1"
         else
             echo "Invalid namespace: $1"
