@@ -1,11 +1,11 @@
+POWERLEVEL9K_MODE="awesome-patched"
+ZSH_THEME="powerlevel9k/powerlevel9k"
+
 if [[ "$OSTYPE" == "linux"* ]]; then
     source /usr/share/zsh-theme-powerlevel9k/powerlevel9k.zsh-theme
 elif [[ "$OSTYPE" == "darwin"* ]]; then
     source /usr/local/opt/powerlevel9k/powerlevel9k.zsh-theme
 fi
-
-ZSH_THEME="powerlevel9k/powerlevel9k"
-POWERLEVEL9K_MODE="awesome-fontconfig"
 
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
 POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
