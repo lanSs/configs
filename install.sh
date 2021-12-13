@@ -27,10 +27,14 @@ if [ "$1" = "install" ]; then
     for f in $(find . -maxdepth 1 -name "dot*"); do
         install $(pwd) $(basename $f)  
     done
+
+    git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
 elif [ "$1" = "uninstall" ]; then
     for f in $(find . -maxdepth 1 -name "dot*"); do
         remove $(basename $f)  
     done
+
+    rm -rf ~/.tmux
 else
     usage
 fi

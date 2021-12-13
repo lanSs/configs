@@ -1,6 +1,7 @@
 export AWS_DEFAULT_PROFILE="hinge-dev"
 export AWS_PROFILE=$AWS_DEFAULT_PROFILE
 export AWS_DEFAULT_REGION="us-east-1"
+export AWS_SHARED_CREDENTIALS_FILE=~/.aws/credentials
 
 # keep varibles between session
 AWS_PROFILE_TMP="/tmp/aws_profile"
@@ -53,11 +54,16 @@ aws-instances() {
 
 #  Usage: aws-elb-ips elb-name
 aws-elb-ips() {
-    if [ $# -ne 1 ]; then
-        echo "aws-elb-ips elb-name"
-    else
+    if [ $# -eq 0 ]; then
+        echo "aws-elb-ips elb-name [public]"
+    elif [ $# -eq 1 ]; then
         aws ec2 describe-network-interfaces --filters Name=description,Values="ELB */${1}/*"                                    \
             --query 'NetworkInterfaces[*].PrivateIpAddresses[*].PrivateIpAddress' --output text
+    elif [ "$2" "==" "public" ]; then
+        aws ec2 describe-network-interfaces --filters Name=description,Values="ELB */${1}/*"                                    \
+            --query 'NetworkInterfaces[*].PrivateIpAddresses[*].Association.PublicIp' --output text
+    else
+        echo "aws-elb-ips elb-name [public]"
     fi
 }
 
@@ -81,7 +87,7 @@ aws-profile() {
 
     if [ $# -eq 0 ]; then
 
-        for p in $(grep '\[' ~/.aws/credentials | tr -d '[]' | sort -n); do
+        for p in $(grep '\[' ~/.aws/config | tr -d '[]' | sed 's/profile //g' | sort -n); do
             if [ "$AWS_DEFAULT_PROFILE" = "$p" ]; then
                 echo "${darkbg}${yellow}${p}${normal}"
             else
@@ -89,7 +95,7 @@ aws-profile() {
             fi
         done
     else
-        if grep '\[' $HOME/.aws/credentials | tr -d '[]' | grep -q "^${1}$"; then 
+        if grep '\[' $HOME/.aws/config | tr -d '[]' | sed 's/profile //g' | grep -q "^${1}$"; then 
             echo "Swithing to profile: $1"
             # This is used by SDK
             export AWS_PROFILE=$1
@@ -113,4 +119,34 @@ aws-profile() {
     fi
 }
 
+aws-assume-role() {
+    local timestamp=$(date +%s)
+    if [ $# -ne 1 ]; then
+        echo "aws-assume-role role_arn"
+    elif [[ "$1" == "unset" ]]; then
+        unset AWS_ACCESS_KEY_ID
+        unset AWS_SECRET_ACCESS_KEY
+        unset AWS_SESSION_TOKEN
 
+        echo "Unset AWS credentials variables"
+        local current_role=$(aws sts get-caller-identity | jq '.Arn')
+        echo "Current user: $current_role"
+    else
+        OUTPUT=$(aws sts assume-role                        \
+            --role-arn $1                                   \
+            --role-session-name lchen-local-cli-$timestamp)
+
+        if [ $? ]; then
+            local role=$(echo $OUTPUT | jq '.AssumedRoleUser.Arn' | tr -d '"')
+            echo "Assumed Role: $role"
+
+            AWS_ACCESS_KEY_ID=$(echo $OUTPUT | jq '.Credentials.AccessKeyId' | tr -d '"')
+            AWS_SECRET_ACCESS_KEY=$(echo $OUTPUT | jq '.Credentials.SecretAccessKey' | tr -d '"')
+            AWS_SESSION_TOKEN=$(echo $OUTPUT | jq '.Credentials.SessionToken' | tr -d '"')
+            
+            export AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+            export AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+            export AWS_SESSION_TOKEN=$AWS_SESSION_TOKEN
+        fi
+   fi
+}

@@ -4,6 +4,7 @@ SAVEHIST=$HISTSIZE
 
 export TERM="xterm-256color" 
 export GOPATH=~/Workspace/go
+export PATH="/opt/homebrew/bin:$PATH:$HOME/.bin"
 
 for file in $HOME/.zsh/*.zsh; do
     source $file

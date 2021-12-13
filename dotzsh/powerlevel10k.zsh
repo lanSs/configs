@@ -1,10 +1,14 @@
 POWERLEVEL9K_MODE="awesome-patched"
-ZSH_THEME="powerlevel9k/powerlevel9k"
+ZSH_THEME="powerlevel10k/powerlevel10k"
 
 if [[ "$OSTYPE" == "linux"* ]]; then
-    source /usr/share/zsh-theme-powerlevel9k/powerlevel9k.zsh-theme
+    source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    source /usr/local/opt/powerlevel9k/powerlevel9k.zsh-theme
+    if [[ `uname -m` == "x86_64" ]]; then
+        source /usr/local/opt/powerlevel10k/powerlevel10k.zsh-theme
+    else
+        source /opt/homebrew/opt/powerlevel10k/powerlevel10k.zsh-theme
+    fi
 fi
 
 prompt_aws() {
@@ -18,4 +22,5 @@ POWERLEVEL9K_CUSTOM_AWS_FOREGROUND="white"
 POWERLEVEL9K_SHORTEN_DIR_LENGTH=2
 POWERLEVEL9K_SHORTEN_STRATEGY="truncate_from_right"
 POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context custom_aws kubecontext newline dir vcs)
+#POWERLEVEL9K_LEFT_PROMPT_ELEMENTS=(context custom_aws newline dir vcs)
 POWERLEVEL9K_RIGHT_PROMPT_ELEMENTS=(status root_indicator background_jobs)

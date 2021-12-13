@@ -1,0 +1,42 @@
+# List of plugins
+set -g @plugin 'tmux-plugins/tpm'
+set -g @plugin "arcticicestudio/nord-tmux"
+set -g @plugin 'tmux-plugins/tmux-sidebar'
+
+
+set -g @logging-path '/tmp'
+
+# Other examples:
+# set -g @plugin 'github_username/plugin_name'
+# set -g @plugin 'git@github.com/user/plugin'
+# set -g @plugin 'git@bitbucket.com/user/plugin'
+
+# Set prefix to Ctrl+a
+unbind C-b
+set -g prefix C-a
+bind a send-prefix
+
+# split panes using | and -
+bind | split-window -h
+bind - split-window -v
+unbind '"'
+unbind %
+
+# vi keys for switching panes
+bind-key h select-pane -L
+bind-key j select-pane -D
+bind-key k select-pane -U
+bind-key l select-pane -R
+
+# shift-movement keys will resize panes
+bind J resize-pane -D 5
+bind K resize-pane -U 5
+bind H resize-pane -L 5
+bind L resize-pane -R 5
+
+# Set tabs at index 1
+set -g base-index 1
+set -g mouse on
+
+# Initialize TMUX plugin manager (keep this line at the very bottom of tmux.conf)
+run -b '~/.tmux/plugins/tpm/tpm'

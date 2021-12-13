@@ -4,11 +4,12 @@
     status = auto
 
 [user]
-    name = Li Chen
-    email = mail@chen.li
+	name = Li Chen
+	email = mail@chen.li
 
 [core]
     editor = vim
+	excludesfile = /Users/lichen/.gitignore_global
 
 [push]
     default = simple
