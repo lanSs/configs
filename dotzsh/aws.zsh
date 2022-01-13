@@ -1,5 +1,4 @@
-export AWS_DEFAULT_PROFILE="hinge-dev"
-export AWS_PROFILE=$AWS_DEFAULT_PROFILE
+export AWS_PROFILE="hinge-dev"
 export AWS_DEFAULT_REGION="us-east-1"
 export AWS_SHARED_CREDENTIALS_FILE=~/.aws/credentials
 
@@ -9,7 +8,6 @@ AWS_REGION_TMP="/tmp/aws_region"
 
 if [ -f $AWS_PROFILE_TMP ]; then
     VALUE=$(<$AWS_PROFILE_TMP)
-    export AWS_DEFAULT_PROFILE=$VALUE
     export AWS_PROFILE=$VALUE
 fi
 
@@ -88,7 +86,7 @@ aws-profile() {
     if [ $# -eq 0 ]; then
 
         for p in $(grep '\[' ~/.aws/config | tr -d '[]' | sed 's/profile //g' | sort -n); do
-            if [ "$AWS_DEFAULT_PROFILE" = "$p" ]; then
+            if [ "$AWS_PROFILE" = "$p" ]; then
                 echo "${darkbg}${yellow}${p}${normal}"
             else
                 echo $p
@@ -97,10 +95,7 @@ aws-profile() {
     else
         if grep '\[' $HOME/.aws/config | tr -d '[]' | sed 's/profile //g' | grep -q "^${1}$"; then 
             echo "Swithing to profile: $1"
-            # This is used by SDK
             export AWS_PROFILE=$1
-            # This is used by cli
-            export AWS_DEFAULT_PROFILE=$1
             echo -n $1 > $AWS_PROFILE_TMP
         else
             echo "Invalid AWS profile: $1"
@@ -121,6 +116,7 @@ aws-profile() {
 
 aws-assume-role() {
     local timestamp=$(date +%s)
+    local user=$(echo $USER | tr -cd '[a-zA-Z-]')
     if [ $# -ne 1 ]; then
         echo "aws-assume-role role_arn"
     elif [[ "$1" == "unset" ]]; then
@@ -134,7 +130,7 @@ aws-assume-role() {
     else
         OUTPUT=$(aws sts assume-role                        \
             --role-arn $1                                   \
-            --role-session-name lchen-local-cli-$timestamp)
+            --role-session-name $user-local-cli-$timestamp)
 
         if [ $? ]; then
             local role=$(echo $OUTPUT | jq '.AssumedRoleUser.Arn' | tr -d '"')
