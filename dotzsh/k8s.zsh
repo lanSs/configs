@@ -67,4 +67,10 @@ kc-ns() {
     fi
 }
 
-
+kc-debug() {
+    if [ $# -eq 0 ]; then
+        kubectl run -i --rm --tty lchen-debug --image=busybox --restart=Never -- sh
+    else
+        kubectl run -i --rm --tty lchen-debug --image=$1 --restart=Never -- sh
+    fi
+}

@@ -1,4 +1,5 @@
-export AWS_PROFILE="hinge-dev"
+export AWS_DEFAULT_PROFILE="something"
+export AWS_PROFILE=$AWS_DEFAULT_PROFILE
 export AWS_DEFAULT_REGION="us-east-1"
 export AWS_SHARED_CREDENTIALS_FILE=~/.aws/credentials
 
@@ -17,7 +18,7 @@ if [ -f $AWS_REGION_TMP ]; then
 fi
 
 declare -A aws_region_shortname
-aws_region_shortname=(
+ws_region_shortname=(
     [us-east-1]="ue1"
     [us-east-2]="ue2"
     [us-west-1]="uw1"
@@ -47,21 +48,6 @@ aws-instances() {
         aws ec2 describe-instances --output table                                                                               \
             --query 'Reservations[].Instances[].[InstanceId,Tags[?Key==`Name`] | [0].Value,PrivateIpAddress, State.Name]'       \
             --filters "Name=tag:Name,Values=*${1}*"
-    fi
-}
-
-#  Usage: aws-elb-ips elb-name
-aws-elb-ips() {
-    if [ $# -eq 0 ]; then
-        echo "aws-elb-ips elb-name [public]"
-    elif [ $# -eq 1 ]; then
-        aws ec2 describe-network-interfaces --filters Name=description,Values="ELB */${1}/*"                                    \
-            --query 'NetworkInterfaces[*].PrivateIpAddresses[*].PrivateIpAddress' --output text
-    elif [ "$2" "==" "public" ]; then
-        aws ec2 describe-network-interfaces --filters Name=description,Values="ELB */${1}/*"                                    \
-            --query 'NetworkInterfaces[*].PrivateIpAddresses[*].Association.PublicIp' --output text
-    else
-        echo "aws-elb-ips elb-name [public]"
     fi
 }
 
