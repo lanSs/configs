@@ -18,7 +18,7 @@ if [ -f $AWS_REGION_TMP ]; then
 fi
 
 declare -A aws_region_shortname
-ws_region_shortname=(
+aws_region_shortname=(
     [us-east-1]="ue1"
     [us-east-2]="ue2"
     [us-west-1]="uw1"
